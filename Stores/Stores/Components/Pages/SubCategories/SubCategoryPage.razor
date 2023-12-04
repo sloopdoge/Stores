@@ -1,0 +1,159 @@
+﻿@page "/sub-category"
+@page "/sub-category/{id:int}"
+@inject ICategoryService CategoryService
+@inject ISubCategoryService SubCategoryService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Sub Category</PageTitle>
+
+@if (Id is null)
+{
+    <h1>Create sub category</h1>
+}
+else
+{
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Edit sub category</h1>
+        <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateSubCategory())">
+            Create new sub category
+        </button>
+    </div>
+    <h3>@subCategory.SubCategoryTitle</h3>
+}
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="(() => CloseDialogAndNavigate())">OK</button>
+    </div>
+</ModalDialog>
+
+<EditForm Model="subCategory" OnSubmit="HandleSubmit" FormName="subCategoryForm">
+    <div>
+        <label for="categoryDropDown">Category</label>
+        <InputSelect id="categoryDropDown" @bind-Value="subCategory.CategoryID">
+            <option value="@subCategory.Category.CategoryID">@subCategory.Category.CategoryTitle</option>
+            @foreach(var category in categories)
+            {
+                <option value="@category.CategoryID">@category.CategoryTitle</option>
+            }
+        </InputSelect>
+        <label for="title">Sub category Title</label>
+        <InputText id="title" @bind-Value="subCategory.SubCategoryTitle" class="form-control" />
+    </div>
+    <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
+    @if (Id is not null)
+    {
+        <button class="btn btn-danger" style="font-size: 16px; padding: 10px;" @onclick="(() => DeleteSubCategory((int)Id))">
+            Delete
+        </button>
+    }
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;    
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+
+
+    [SupplyParameterFromForm]
+    Stores.Entities.SubCategory subCategory { get; set; } = Stores.Entities.SubCategory();
+
+    List<Category> categories = null;
+    string uri = "/sub-categories";
+
+    protected override async Task OnInitializedAsync() 
+    {
+        btnText = Id == null ? "Save" : "Edit";
+
+        categories = await CategoryService.GetCategories();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await SubCategoryService.GetSubCategoryById((int)Id);          
+
+            if (result is not null) 
+            {
+                subCategory = result;
+
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/sub-categories");
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {       
+        if (Id is null)
+        {            
+            string message = "Sub category created.";
+
+            var result = await SubCategoryService.CreateSubCategory(subCategory);
+
+            uri = $"/sub-category/{result.SubCategoryID}";
+            ShowModalDialog(message);
+        }
+        else
+        {
+            string message = "Sub category edited.";
+
+            var result = await CategoryService.EditSubCategory((int)Id, subCategory);
+
+            uri = $"/sub-category/{(int)Id}";
+            ShowModalDialog(message);
+        }
+    }
+
+    async Task DeleteSubCategory(int id)
+    {
+        uri = "/sub-categories";
+
+        string modalSuccessText = "Sub category successfully deleted";
+        string modalErrorText = "Error occured while deleting sub category";
+
+        var result = await SubCategoryService.DeleteSubCategory(id);
+        if (result)
+        {
+            ShowModalDialog(result, modalSuccessText);
+        }
+        else
+            ShowModalDialog(result, modalErrorText);
+    }
+
+    void ShowModalDialog(bool isSuccess, string text)
+    {
+        if (isSuccess) modalText = text;
+        else modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void ShowModalDialog(string text)
+    {
+        modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void CloseDialogAndNavigate()
+    {
+        ModalDialog.Close();
+        NavigationManager.NavigateTo(uri);
+    }
+
+    void CreateCategory()
+    {
+        NavigationManager.NavigateTo("/category");
+    }
+}

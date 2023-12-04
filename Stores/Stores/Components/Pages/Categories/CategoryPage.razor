@@ -1,0 +1,145 @@
+﻿@page "/category"
+@page "/category/{id:int}"
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Category</PageTitle>
+
+@if (Id is null)
+{
+    <h1>Create new category</h1>
+    <h3>Create new category</h3>
+}
+else
+{
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Edit category</h1>
+        <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateCategory())">
+            Create new category
+        </button>
+    </div>
+    <h3>@category.CategoryTitle</h3>
+}
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="(() => CloseDialogAndNavigate())">OK</button>
+    </div>
+</ModalDialog>
+
+<EditForm Model="category" OnSubmit="HandleSubmit" FormName="categoryForm">
+    <div>
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="category.CategoryTitle" class="form-control" />
+    </div>
+    <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
+    @if (Id is not null)
+    {
+        <button class="btn btn-danger" style="font-size: 16px; padding: 10px;" @onclick="(() => DeleteCategory((int)Id))">
+            Delete
+        </button>
+    }
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;    
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+
+
+    [SupplyParameterFromForm]
+    Stores.Entities.Category category { get; set; } = new Stores.Entities.Category { CategoryTitle = "New category" };
+    string uri = "/categories";
+
+    protected override void OnInitialized() =>
+        btnText = Id == null ? "Save" : "Edit";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await CategoryService.GetCategoryById((int)Id);          
+
+            if (result is not null) 
+            {
+                category = result;
+
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/categories");
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {       
+        if (Id is null)
+        {            
+            string message = "Category created.";
+
+            var result = await CategoryService.CreateCategory(category);
+
+            uri = $"/category/{result.CategoryID}";
+            ShowModalDialog(message);
+        }
+        else
+        {
+            string message = "Category edited.";
+
+            var result = await CategoryService.EditCategory((int)Id, category);
+
+            uri = $"/category/{(int)Id}";
+            ShowModalDialog(message);
+        }
+    }
+
+    async Task DeleteCategory(int id)
+    {
+        uri = "/categories";
+
+        string modalSuccessText = "Category successfully deleted";
+        string modalErrorText = "Error occured while deleting category";
+
+        var result = await CategoryService.DeleteCategory(id);
+        if (result)
+        {
+            ShowModalDialog(result, modalSuccessText);
+        }
+        else
+            ShowModalDialog(result, modalErrorText);
+    }
+
+    void ShowModalDialog(bool isSuccess, string text)
+    {
+        if (isSuccess) modalText = text;
+        else modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void ShowModalDialog(string text)
+    {
+        modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void CloseDialogAndNavigate()
+    {
+        ModalDialog.Close();
+        NavigationManager.NavigateTo(uri);
+    }
+
+    void CreateCategory()
+    {
+        NavigationManager.NavigateTo("/category");
+    }
+}

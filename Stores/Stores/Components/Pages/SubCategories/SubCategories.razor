@@ -1,0 +1,101 @@
+﻿@page "/sub-categories"
+@inject ICategoryService CategoryService
+@inject ISubCategoryService SubCategoryService
+@inject NavigationManager NavigationManager
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Sub Categories</PageTitle>
+
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Sub Categories</h1>
+    <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateSubCategory())">
+        Create new sub category
+    </button>
+</div>
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">OK</button>
+    </div>
+</ModalDialog>
+
+@if (subCategories == null)
+{
+    <span> Loading... </span>
+}
+else if (subCategories.Count == 0)
+{   
+    <div>
+        <span> No sub categories found </span>
+    </div>
+}
+else {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sub Categories list</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var subCategory in subCategories)
+            {
+                <tr>
+                    <td>@subCategory.SubCategoryTitle</td>
+                    <td>@subCategory.Category.CategoryTitle</td>
+                    <td>
+                        <button class="btn btn-primary" style="font-size: 14px; padding: 10px;" @onclick="(() => EditSubCategory(subCategory.SubCategoryID))">
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" style="font-size: 14px; padding: 10px;" @onclick="(() => DeleteSubCategory(subCategory.SubCategoryID))">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<SubCategory> subCategories = null;
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+    string modalSuccessText = "Sub category successfully deleted";
+    string modalErrorText = "Error occured while deleting sub category";
+
+    protected override async Task OnInitializedAsync() => subCategories = await SubCategoryService.GetSubCategories();
+
+    void CreateSubCategory()
+    {
+        NavigationManager.NavigateTo("/sub-category");
+    }
+
+    void EditSubCategory(int id)
+    {
+        NavigationManager.NavigateTo($"/sub-category/{id}");
+    }
+
+    async Task DeleteSubCategory(int id)
+    {
+        var result = await SubCategoryService.DeleteSubCategory(id);
+        if (result)
+        {
+            ShowModalDialog(result);
+            subCategories = await SubCategoryService.GetSubCategories();
+        }
+        else
+            ShowModalDialog(result);
+    }
+
+    void ShowModalDialog(bool isSuccess)
+    {
+        if (isSuccess) modalText = modalSuccessText;
+        else modalText = modalErrorText;
+
+        ModalDialog.Open();
+    }
+}

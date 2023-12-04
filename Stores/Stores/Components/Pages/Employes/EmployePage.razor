@@ -1,0 +1,173 @@
+﻿@page "/employe"
+@page "/employe/{id:int}"
+@inject IEmployeService EmployeService
+@inject IHumanService HumanService
+@inject IStoreService StoreService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Employe</PageTitle>
+
+@if (Id is null)
+{
+    <h1>Create new employe</h1>
+    <h3>Create new employe</h3>
+}
+else
+{
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Edit employe</h1>
+        <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateEmploye())">
+            Create new employe
+        </button>
+    </div>
+    <h3>Employe @employe.Human.FirstName @employe.Human.LastName</h3>
+}
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="(() => CloseDialogAndNavigate())">OK</button>
+    </div>
+</ModalDialog>
+
+<EditForm Model="employe" OnSubmit="HandleSubmit" FormName="employeForm">
+    <div>
+        <label for="humanDropdown">Human</label>
+        <InputSelect id="humanDropdown" @bind-Value="employe.HumanID">
+            <option value="">Select...</option>
+            @foreach (var human in humans)
+            {
+                <option value="@human.HumanID">@($"{human.FirstName} {human.LastName}")</option>
+            }
+        </InputSelect>
+        <label for="dateTimePicker">Start Date and Time of work:</label>
+        <InputDate id="dateTimePicker" @bind-Value="employe.DateOfWork" />
+        <label for="position">Position</label>
+        <InputText id="position" @bind-Value="employe.Position" class="form-control" />
+        <label for="storeDropdown">Store</label>
+        <InputSelect id="storeDropdown" @bind-Value="employe.StoreID">
+            <option value="">Select...</option>
+            @foreach (var store in stores)
+            {
+                <option value="@store.StoreID">@store.Title</option>
+            }
+        </InputSelect>
+    </div>
+    <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
+    @if (Id is not null)
+    {
+        <button class="btn btn-danger" style="font-size: 16px; padding: 10px;" @onclick="(() => DeleteEmploye((int)Id))">
+            Delete
+        </button>
+    }
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+
+
+    [SupplyParameterFromForm]
+    Stores.Entities.Employe employe { get; set; } = new Stores.Entities.Employe();
+    string uri = "/employes";
+
+    List<Human> humans = null;
+    List<Store> stores = null;
+
+    protected override async void OnInitialized() 
+    {
+        btnText = Id == null ? "Save" : "Edit";
+
+        humans = await HumanService.GetHumans();
+        stores = await StoreService.GetStores();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+        var result = await EmployeService.GetEmployeById((int)Id);
+
+            if (result is not null)
+            {
+                employe = result;
+
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/categories");
+            }
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id is null)
+        {
+            string message = "Employe created.";
+
+            var result = await EmployeService.CreateEmploye(employe);
+
+            uri = $"/employe/{result.EmployeID}";
+            ShowModalDialog(message);
+        }
+        else
+        {
+            string message = "Employe edited.";
+
+            var result = await EmployeService.EditEmploye((int)Id, employe);
+
+            uri = $"/employe/{(int)Id}";
+            ShowModalDialog(message);
+        }
+    }
+
+    async Task DeleteEmploye(int id)
+    {
+        uri = "/employes";
+
+        string modalSuccessText = "Category successfully deleted";
+        string modalErrorText = "Error occured while deleting category";
+
+        var result = await EmployeService.DeleteEmploye(id);
+        if (result)
+        {
+            ShowModalDialog(result, modalSuccessText);
+        }
+        else
+            ShowModalDialog(result, modalErrorText);
+    }
+
+    void ShowModalDialog(bool isSuccess, string text)
+    {
+        if (isSuccess) modalText = text;
+        else modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void ShowModalDialog(string text)
+    {
+        modalText = text;
+
+        ModalDialog.Open();
+    }
+
+    void CloseDialogAndNavigate()
+    {
+        ModalDialog.Close();
+        NavigationManager.NavigateTo(uri);
+    }
+
+    void CreateEmploye()
+    {
+        NavigationManager.NavigateTo("/employe");
+    }
+}

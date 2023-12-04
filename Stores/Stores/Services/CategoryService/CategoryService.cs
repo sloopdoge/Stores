@@ -15,10 +15,26 @@ namespace Stores.Services.CategoryService
 
         public async Task<Category> CreateCategory(Category category)
         {
-            _context.Add(category);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Add(category);
+                await _context.SaveChangesAsync();
+
+                return category;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"An error occurred while updating the database: {ex.Message}");
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+
+                return null;
+            }
             
-            return category;
         }
 
         public async Task<bool> DeleteCategory(int categoryId)

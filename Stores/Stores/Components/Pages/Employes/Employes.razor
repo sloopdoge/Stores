@@ -1,0 +1,118 @@
+﻿@page "/employes"
+@inject IEmployeService EmployeService
+@inject IHumanService HumanService
+@inject IStoreService StoreService
+@inject NavigationManager NavigationManager
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Employes</PageTitle>
+
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Employes</h1>
+    <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateEmploye())">
+        Create new employe
+    </button>
+</div>
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">OK</button>
+    </div>
+</ModalDialog>
+
+@if (employes == null)
+{
+    <span> Loading... </span>
+}
+else if (employes.Count == 0)
+{
+    <div>
+        <span> No employes found </span>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employe in employes)
+            {
+                <tr>                    
+                    <td>@employe.Human.FirstName @employe.Human.LastName</td>
+                    <td>@employe.DateOfWork</td>
+                    <td>@employe.Position</td>
+                    <td>@employe.Store.Title</td>
+                    <td>
+                        <button class="btn btn-primary" style="font-size: 14px; padding: 10px;" @onclick="(() => EditEmploye(employe.EmployeID))">
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" style="font-size: 14px; padding: 10px;" @onclick="(() => DeleteEmploye(employe.EmployeID))">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Employe> employes = null;
+    // List<Human> humans = null;
+    // List<Store> stores = null;
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+    string modalSuccessText = "Employe successfully deleted";
+    string modalErrorText = "Error occured while deleting employe";
+
+    protected override async Task OnInitializedAsync()
+    {
+        employes = await EmployeService.GetEmployes();
+        // if (employes.Count != 0)
+        // {
+        //     foreach(var employe in employes)
+        //     {
+        //         humans.Add(await HumanService.GetHumanById(employe.HumanID));
+        //         stores.Add(await StoreService.GetStoreById(employe.StoreID));
+        //     }
+        // }
+    }
+
+    void CreateEmploye()
+    {
+        NavigationManager.NavigateTo("/employe");
+    }
+
+    void EditEmploye(int id)
+    {
+        NavigationManager.NavigateTo($"/employe/{id}");
+    }
+
+    async Task DeleteEmploye(int id)
+    {
+        var result = await EmployeService.DeleteEmploye(id);
+        if (result)
+        {
+            ShowModalDialog(result);
+            employes = await EmployeService.GetEmployes();
+        }
+        else
+            ShowModalDialog(result);
+    }
+
+    void ShowModalDialog(bool isSuccess)
+    {
+        if (isSuccess) modalText = modalSuccessText;
+        else modalText = modalErrorText;
+
+        ModalDialog.Open();
+    }
+}

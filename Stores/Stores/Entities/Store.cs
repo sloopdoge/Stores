@@ -8,6 +8,9 @@
         public string Address { get; set; }
         public string Email { get; set; }
         public int PostCode { get; set; }
-        public int Owner { get; set; }
+        public int? Owner { get; set; }
+
+        public virtual ICollection<Employe> Employes { get; set; }
+        public virtual Human OwnerHuman { get; set; }
     }
 }

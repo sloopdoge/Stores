@@ -1,0 +1,99 @@
+﻿@page "/categories"
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@attribute [StreamRendering(true)]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<PageTitle>Categories</PageTitle>
+
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1>Categories</h1>
+    <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateCategory())">
+        Create new category
+    </button>
+</div>
+
+<ModalDialog @ref="@ModalDialog" Title="@modalText">
+    <div class="modal-footer">
+        <button class="btn btn-primary" @onclick="() => ModalDialog.Close()">OK</button>
+    </div>
+</ModalDialog>
+
+@if (categories == null)
+{
+    <span> Loading... </span>
+}
+else if (categories.Count == 0)
+{   
+    <div>
+        <span> No categories found </span>
+    </div>
+}
+else {
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>@category.CategoryTitle</td>
+                    <td>
+                        <button class="btn btn-primary" style="font-size: 14px; padding: 10px;" @onclick="(() => EditCategory(category.CategoryID))">
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" style="font-size: 14px; padding: 10px;" @onclick="(() => DeleteCategory(category.CategoryID))">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    List<Category> categories = null;
+
+    ModalDialog ModalDialog { get; set; }
+
+    string modalText = String.Empty;
+    string modalSuccessText = "Category successfully deleted";
+    string modalErrorText = "Error occured while deleting category";
+
+    protected override async Task OnInitializedAsync() => categories = await CategoryService.GetCategories();
+
+    void CreateCategory()
+    {
+        NavigationManager.NavigateTo("/category");
+    }
+
+    void EditCategory(int id)
+    {
+        NavigationManager.NavigateTo($"/category/{id}");
+    }
+
+    async Task DeleteCategory(int id)
+    {
+        var result = await CategoryService.DeleteCategory(id);
+        if (result)
+        {
+            ShowModalDialog(result);
+            categories = await CategoryService.GetCategories();
+        }
+        else
+            ShowModalDialog(result);
+    }
+
+    void ShowModalDialog(bool isSuccess)
+    {
+        if (isSuccess) modalText = modalSuccessText;
+        else modalText = modalErrorText;
+
+        ModalDialog.Open();
+    }
+}

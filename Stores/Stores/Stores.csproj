@@ -21,4 +21,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Pages\Humans\" />
+    <Folder Include="Components\Pages\Stores\" />
+  </ItemGroup>
+
 </Project>

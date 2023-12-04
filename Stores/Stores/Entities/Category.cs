@@ -2,7 +2,9 @@
 {
     public class Category
     {
-        public int CategoryId { get; set; }
+        public int CategoryID { get; set; }
         public string CategoryTitle { get; set; }
+
+        public virtual ICollection<SubCategory> SubCategories { get; set; }
     }
 }
