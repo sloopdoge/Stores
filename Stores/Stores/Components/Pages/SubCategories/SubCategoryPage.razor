@@ -63,7 +63,7 @@ else
 
 
     [SupplyParameterFromForm]
-    Stores.Entities.SubCategory subCategory { get; set; } = Stores.Entities.SubCategory();
+    Stores.Entities.SubCategory subCategory { get; set; } = new Stores.Entities.SubCategory();
 
     List<Category> categories = null;
     string uri = "/sub-categories";
@@ -108,7 +108,7 @@ else
         {
             string message = "Sub category edited.";
 
-            var result = await CategoryService.EditSubCategory((int)Id, subCategory);
+            var result = await SubCategoryService.EditSubCategory((int)Id, subCategory);
 
             uri = $"/sub-category/{(int)Id}";
             ShowModalDialog(message);
@@ -152,8 +152,8 @@ else
         NavigationManager.NavigateTo(uri);
     }
 
-    void CreateCategory()
+    void CreateSubCategory()
     {
-        NavigationManager.NavigateTo("/category");
+        NavigationManager.NavigateTo("/sub-category");
     }
 }
