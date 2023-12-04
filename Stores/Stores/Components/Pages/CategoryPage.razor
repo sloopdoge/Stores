@@ -1,0 +1,65 @@
+﻿@page "/category"
+@page "/category/{id:int}"
+@inject ICategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
+
+<PageTitle>Category</PageTitle>
+
+@if (Id is null)
+{
+    <PageTitle>Create a new category</PageTitle>
+    <h3>Create a new category</h3>
+}
+else
+{
+    <PageTitle>Edit @category.CategoryTitle</PageTitle>
+    <h3>Edit @category.CategoryTitle</h3>
+}
+
+<EditForm Model="category" OnSubmit="HandleSubmit" FormName="categoryForm">
+    <div>
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="category.CategoryTitle" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    @if (Id is not null)
+    {
+        <DeleteButton itemId="@category.CategoryId" entityType="@EntityType.Category"/>
+    }
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    string btnText = string.Empty;   
+
+    [SupplyParameterFromForm]
+    Stores.Entities.Category category { get; set; } = new Stores.Entities.Category { CategoryTitle = "New category" };
+
+    protected override void OnInitialized() =>
+        btnText = Id == null ? "Save new category" : "Edit category";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var result = await CategoryService.GetCategoryById((int)Id);
+
+            if (result is not null)
+                category = result;
+            else
+                NavigationManager.NavigateTo("/categories");
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+    if (Id is null)
+        await CategoryService.CreateCategory(category);
+    else
+        await CategoryService.EditCategory((int)Id, category);
+    }
+}
