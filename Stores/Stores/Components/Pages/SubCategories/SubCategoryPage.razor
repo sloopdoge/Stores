@@ -30,16 +30,20 @@ else
 
 <EditForm Model="subCategory" OnSubmit="HandleSubmit" FormName="subCategoryForm">
     <div>
+        <div>
         <label for="categoryDropDown">Category</label>
-        <InputSelect id="categoryDropDown" @bind-Value="subCategory.CategoryID">
-            <option value="@subCategory.Category.CategoryID">@subCategory.Category.CategoryTitle</option>
-            @foreach(var category in categories)
-            {
-                <option value="@category.CategoryID">@category.CategoryTitle</option>
-            }
-        </InputSelect>
-        <label for="title">Sub category Title</label>
-        <InputText id="title" @bind-Value="subCategory.SubCategoryTitle" class="form-control" />
+            <InputSelect id="categoryDropDown" @bind-Value="subCategory.CategoryID">
+                <option value="">Select...</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.CategoryID">@category.CategoryTitle</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="title">Sub category Title</label>
+            <InputText id="title" @bind-Value="subCategory.SubCategoryTitle" class="form-control" />
+        </div>
     </div>
     <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
     @if (Id is not null)
@@ -65,14 +69,19 @@ else
     [SupplyParameterFromForm]
     Stores.Entities.SubCategory subCategory { get; set; } = new Stores.Entities.SubCategory();
 
-    List<Category> categories = null;
+    List<Category> categories = new List<Category>();
     string uri = "/sub-categories";
 
     protected override async Task OnInitializedAsync() 
     {
         btnText = Id == null ? "Save" : "Edit";
 
-        categories = await CategoryService.GetCategories();
+        var result = await CategoryService.GetCategories();
+
+        foreach(var category in result)
+        {
+            categories.Add(category);
+        }        
     }
 
     protected override async Task OnParametersSetAsync()

@@ -18,7 +18,19 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<DataContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
     ServiceLifetime.Scoped);
-builder.Services.AddScoped<DataContext>();
+
+//builder.Services.AddDbContext<CategoryDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
+//builder.Services.AddDbContext<EmployeDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
+//builder.Services.AddDbContext<HumanDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
+//builder.Services.AddDbContext<ProductDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
+//builder.Services.AddDbContext<StoreDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
+//builder.Services.AddDbContext<SubCategoryDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+//    ServiceLifetime.Scoped);
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IEmployeService, EmployeService>();

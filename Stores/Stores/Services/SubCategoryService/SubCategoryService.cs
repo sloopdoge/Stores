@@ -15,18 +15,27 @@ namespace Stores.Services.SubCategoryService
 
         public async Task<List<SubCategory>> GetSubCategories()
         {
-            return await _context.SubCategories.ToListAsync();
+            return await _context.SubCategories
+                .Include(sc => sc.Category)               
+                .ToListAsync();
         }
 
         public async Task<SubCategory?> GetSubCategoryById(int subCategoryId)
         {
-            return await _context.SubCategories.FindAsync(subCategoryId);
+            return await _context.SubCategories
+                .Include(sc => sc.Category)
+                .FirstOrDefaultAsync(sc => sc.SubCategoryID == subCategoryId);                
         }
 
         public async Task<SubCategory> CreateSubCategory(SubCategory subCategory)
         {
             _context.SubCategories.Add(subCategory);
             await _context.SaveChangesAsync();
+
+            await _context.Entry(subCategory)
+                .Reference(sc => sc.Category)
+                .LoadAsync();
+
             return subCategory;
         }
 
@@ -43,6 +52,11 @@ namespace Stores.Services.SubCategoryService
             dbSubCategory.SubCategoryTitle = subCategory.SubCategoryTitle;
 
             await _context.SaveChangesAsync();
+
+            await _context.Entry(dbSubCategory)
+                .Reference(sc => sc.Category)
+                .LoadAsync();
+
             return dbSubCategory;
         }
 
@@ -54,6 +68,10 @@ namespace Stores.Services.SubCategoryService
             {
                 return false;
             }
+
+            await _context.Entry(subCategory)
+                .Reference(sc => sc.Category)
+                .LoadAsync();
 
             _context.SubCategories.Remove(subCategory);
             await _context.SaveChangesAsync();

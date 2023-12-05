@@ -67,7 +67,10 @@ else {
     string modalSuccessText = "Sub category successfully deleted";
     string modalErrorText = "Error occured while deleting sub category";
 
-    protected override async Task OnInitializedAsync() => subCategories = await SubCategoryService.GetSubCategories();
+    protected override async Task OnInitializedAsync() 
+    { 
+        subCategories = await SubCategoryService.GetSubCategories();
+    }
 
     void CreateSubCategory()
     {
