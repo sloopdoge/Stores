@@ -31,30 +31,42 @@ else
 
 <EditForm Model="product" OnSubmit="HandleSubmit" FormName="productForm">
     <div>
+        <div>
         <label for="categoryDropdown">Category</label>
-        <InputSelect id="categoryDropdown" @bind-Value="product.CategoryID">
-            <option value="@product.Category.CategoryID">@product.Category.CategoryTitle</option>
-            @foreach (var category in categories)
-            {
-                <option value="@category.CategoryID">@category.CategoryTitle</option>
-            }
-        </InputSelect>
+            <InputSelect id="categoryDropdown" @bind-Value="product.CategoryID">
+                <option value="@product.Category.CategoryID">@product.Category.CategoryTitle</option>
+                @foreach (var category in categories)
+                {
+                    <option value="@category.CategoryID">@category.CategoryTitle</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
         <label for="subCategoryDropdown">Sub Category</label>
-        <InputSelect id="subCategoryDropdown" @bind-Value="product.SubCategoryID">
-            <option value="@product.SubCategory.SubCategoryID">@product.SubCategory.SubCategoryTitle</option>
-            @foreach (var subCategory in subCategories)
-            {
-                <option value="@subCategory.SubCategoryID">@subCategory.SubCategoryTitle</option>
-            }
-        </InputSelect>
-        <label for="productTitle">Product Title</label>
-        <InputText id="productTitle" @bind-Value="product.ProductTitle" class="form-control" />
-        <label for="taxGroup">Tax Group</label>
-        <InputNumber id="taxGroup" @bind-Value="product.TaxGroup"/>
-        <label for="isMature">Is Mature?</label>
-        <InputCheckbox id="isMature" @bind-Value="product.IsMature"/>
-        <label for="exciseNeeded">Is Mature?</label>
-        <InputCheckbox id="exciseNeeded" @bind-Value="product.ExciseNeeded" />
+            <InputSelect id="subCategoryDropdown" @bind-Value="product.SubCategoryID">
+                <option value="@product.SubCategory.SubCategoryID">@product.SubCategory.SubCategoryTitle</option>
+                @foreach (var subCategory in subCategories)
+                {
+                    <option value="@subCategory.SubCategoryID">@subCategory.SubCategoryTitle</option>
+                }
+            </InputSelect>
+        </div>
+        <div>
+            <label for="productTitle">Product Title</label>
+            <InputText id="productTitle" @bind-Value="product.ProductTitle" class="form-control" />
+        </div>
+        <div>
+            <label for="taxGroup">Tax Group</label>
+            <InputNumber id="taxGroup" @bind-Value="product.TaxGroup"/>
+        </div>
+        <div>
+            <label for="isMature">Is Mature?</label>
+            <InputCheckbox id="isMature" @bind-Value="product.IsMature"/>
+        </div>
+        <div>
+            <label for="exciseNeeded">Is Mature?</label>
+            <InputCheckbox id="exciseNeeded" @bind-Value="product.ExciseNeeded" />
+        </div>
     </div>
     <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
     @if (Id is not null)

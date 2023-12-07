@@ -9,7 +9,6 @@
 @if (Id is null)
 {
     <h1>Create new category</h1>
-    <h3>Create new category</h3>
 }
 else
 {
@@ -31,15 +30,17 @@ else
 <EditForm Model="category" OnSubmit="HandleSubmit" FormName="categoryForm">
     <div>
         <label for="title">Title</label>
-        <InputText id="title" @bind-Value="category.CategoryTitle" class="form-control" />
+        <InputText id="title" @bind-Value="category.CategoryTitle" class="form-control" style="margin-bottom: 15px;" />
     </div>
-    <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
-    @if (Id is not null)
-    {
-        <button class="btn btn-danger" style="font-size: 16px; padding: 10px;" @onclick="(() => DeleteCategory((int)Id))">
-            Delete
-        </button>
-    }
+    <div style="display: flex; justify-content: flex-start;">
+        <button type="submit" style="font-size: 16px; padding: 10px;" class="btn btn-primary">@btnText</button>
+        @if (Id is not null)
+        {
+           <button class="btn btn-danger" style="font-size: 16px; padding: 10px;" @onclick="(async () => await DeleteCategory((int)Id))">
+               Delete
+           </button>
+        }
+    </div>
 </EditForm>
 
 

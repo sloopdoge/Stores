@@ -32,7 +32,22 @@ else if (subCategories.Count == 0)
     </div>
 }
 else {
-    <table class="table">
+    <RadzenDataGrid Data="@subCategories" TItem="SubCategory" ColumnWidth="300px" style="width: 1000px; margin-left: 0;">
+        <Columns>
+            <RadzenDataGridColumn TItem="SubCategory" Property="SubCategoryTitle"
+                                  Title="Sub category Title" TextAlign="Radzen.TextAlign.Left" Width="400px" />
+            <RadzenDataGridColumn TItem="SubCategory" Property="Category.CategoryTitle"
+                                  Title="Category Title" TextAlign="Radzen.TextAlign.Left" Width="400px" />
+            <RadzenDataGridColumn Title="Action" TItem="SubCategory" TextAlign="Radzen.TextAlign.Left" Width="150px">
+                <Template Context="subCategory">
+                        <EditDeleteButtonsBlock Edit="(() => EditSubCategory(subCategory.CategoryID))" Delete="(async () => await DeleteSubCategory(subCategory.CategoryID))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+
+@*     <table class="table">
         <thead>
             <tr>
                 <th>Sub Categories list</th>
@@ -55,7 +70,7 @@ else {
                 </tr>
             }
         </tbody>
-    </table>
+    </table> *@
 }
 
 @code {

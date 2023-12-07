@@ -15,18 +15,25 @@ namespace Stores.Services.ProductService
 
         public async Task<List<Product>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.SubCategory)
+                .ToListAsync();
         }
 
         public async Task<Product?> GetProductById(int productId)
         {
-            return await _context.Products.FindAsync(productId);
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.SubCategory)
+                .FirstOrDefaultAsync(p => p.ProductID == productId);
         }
 
         public async Task<Product> CreateProduct(Product product)
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+
             return product;
         }
 

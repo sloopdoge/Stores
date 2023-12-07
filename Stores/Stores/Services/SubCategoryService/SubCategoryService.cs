@@ -15,6 +15,8 @@ namespace Stores.Services.SubCategoryService
 
         public async Task<List<SubCategory>> GetSubCategories()
         {
+            await Task.Delay(2000);
+
             return await _context.SubCategories
                 .Include(sc => sc.Category)               
                 .ToListAsync();

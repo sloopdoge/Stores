@@ -34,7 +34,29 @@ else if (products.Count == 0)
 }
 else
 {
-    <table class="table">
+    <RadzenDataGrid Data="@products" TItem="Product" ColumnWidth="300px" style="width: 1400px; margin-left: 0;">
+        <Columns>
+            <RadzenDataGridColumn TItem="Product" Property="ProductTitle"
+                                  Title="Product Title" TextAlign="Radzen.TextAlign.Left" Width="300px" />
+            <RadzenDataGridColumn TItem="Product" Property="Category.CategoryTitle"
+                                  Title="Category" TextAlign="Radzen.TextAlign.Left" Width="300px" />
+            <RadzenDataGridColumn TItem="Product" Property="SubCategory.SubCategoryTitle"
+                                  Title="Sub category" TextAlign="Radzen.TextAlign.Left" Width="300px" />
+            <RadzenDataGridColumn TItem="Product" Property="TaxGroup"
+                                  Title="Tax group" TextAlign="Radzen.TextAlign.Left" Width="100px" />
+            <RadzenDataGridColumn TItem="Product" Property="IsMature"
+                                  Title="18+?" TextAlign="Radzen.TextAlign.Left" Width="100px" />
+            <RadzenDataGridColumn TItem="Product" Property="ExciseNeeded"
+                                  Title="Excise Needed?" TextAlign="Radzen.TextAlign.Left" Width="100px" />
+            <RadzenDataGridColumn Title="Action" TItem="Product" TextAlign="Radzen.TextAlign.Left" Width="150px">
+                <Template Context="product">
+                    <EditDeleteButtonsBlock Edit="(() => EditProduct(product.ProductID))" Delete="(async () => await DeleteProduct(product.ProductID))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+@*     <table class="table">
         <thead>
             <tr>
                 <th>Products list</th>
@@ -61,7 +83,7 @@ else
                 </tr>
             }
         </tbody>
-    </table>
+    </table> *@
 }
 
 @code {

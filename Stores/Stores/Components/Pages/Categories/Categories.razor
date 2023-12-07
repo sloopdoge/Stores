@@ -6,7 +6,6 @@
 
 <PageTitle>Categories</PageTitle>
 
-
 <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1>Categories</h1>
     <button class="btn btn-primary" style="font-size: 18px; padding: 10px;" @onclick="(() => CreateCategory())">
@@ -31,7 +30,19 @@ else if (categories.Count == 0)
     </div>
 }
 else {
-    <table class="table">
+    <RadzenDataGrid Data="@categories" TItem="Category" ColumnWidth="300px" style="width: 600px; margin-left: 0;">
+        <Columns>
+            <RadzenDataGridColumn TItem="Category" Property="CategoryTitle" 
+                Title="Category Title" TextAlign="Radzen.TextAlign.Left" Width="400px"/>
+            <RadzenDataGridColumn Title="Action" TItem="Category" TextAlign="Radzen.TextAlign.Left" Width="150px">
+                <Template Context="category">
+                    <EditDeleteButtonsBlock Edit="(() => EditCategory(category.CategoryID))" Delete="(async () => await DeleteCategory(category.CategoryID))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+@*     <table class="table">
         <thead>
             <tr>
                 <th>Title</th>
@@ -42,7 +53,7 @@ else {
             {
                 <tr>
                     <td>@category.CategoryTitle</td>
-                    <td>
+                    <td style="width: 100px">
                         <button class="btn btn-primary" style="font-size: 14px; padding: 10px;" @onclick="(() => EditCategory(category.CategoryID))">
                             Edit
                         </button>
@@ -53,7 +64,7 @@ else {
                 </tr>
             }
         </tbody>
-    </table>
+    </table> *@
 }
 
 @code {

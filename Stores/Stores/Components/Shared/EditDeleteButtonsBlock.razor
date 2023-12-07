@@ -1,0 +1,14 @@
+﻿<div style="display: flex; justify-content: space-around; align-items: center;">
+    <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Primary" Size="Radzen.ButtonSize.Medium"
+                  Click="Edit" Text="Edit" />
+    <RadzenButton Variant="Radzen.Variant.Outlined" ButtonStyle="Radzen.ButtonStyle.Danger" Size="Radzen.ButtonSize.Medium"
+                  Click="Delete" Text="Delete" />
+</div>
+
+@code {
+    [Parameter]
+    public Action Edit { get; set; }
+
+    [Parameter]
+    public Action Delete { get; set; }
+}
